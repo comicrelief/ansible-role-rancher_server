@@ -1,0 +1,16 @@
+---
+
+- name: Pull and run Rancher server container
+  docker:
+    name: "{{ rancher_server_name }}"
+    image: "{{rancher_server_image_name }}"
+    restart_policy: always
+    ports:
+      - "{{ rancher_server_port }}:8080"
+
+- name: Wait for the rancher server to start
+  action: command docker logs {{ rancher_server_name }}
+  register: rancher_logs
+  until: rancher_logs.stdout.find("Listening on") != -1
+  retries: 30
+  delay: 10
